@@ -2,7 +2,9 @@ package controllers
 
 import (
 	"html/template"
+	"log"
 	"net/http"
+	"strconv"
 
 	"appwebgolang.com/models"
 )
@@ -11,5 +13,25 @@ var temp = template.Must(template.ParseGlob("templates/*.html"))
 
 func Index(w http.ResponseWriter, r *http.Request) {
 	todosOsProdutos := models.BuscaTodosOsProdutos()
-	temp.ExecuteTemplate(w, "index", todosOsProdutos)
+	temp.ExecuteTemplate(w, "Index", todosOsProdutos)
+}
+func New(w http.ResponseWriter, r *http.Request) {
+	temp.ExecuteTemplate(w, "New", "")
+}
+func Insert(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		nome := r.FormValue("nome")
+		descricao := r.FormValue("descricao")
+		preco, err := strconv.ParseFloat(r.FormValue("preco"), 64)
+		if err != nil {
+			log.Println("Erro ao converter preço!")
+		}
+		quantidade, err := strconv.Atoi(r.FormValue("quantidade"))
+		if err != nil {
+			log.Println("Erro ao converter quantidade!")
+		}
+		models.CriarNovoProduto(nome, descricao, preco, quantidade)
+
+	}
+	temp.ExecuteTemplate(w, "New", "")
 }
